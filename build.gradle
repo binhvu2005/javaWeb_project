@@ -3,7 +3,7 @@ plugins {
     id 'war'
 }
 
-group 'com.data'
+group 'com.ra'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -22,10 +22,47 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    compileOnly('javax.servlet:javax.servlet-api:4.0.1')
+    compileOnly 'javax.servlet:javax.servlet-api:4.0.1'
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitVersion}"
+
+    // Spring MVC
+    implementation 'org.springframework:spring-webmvc:5.3.23'
+    implementation 'org.springframework:spring-context:5.3.23'
+    implementation 'org.springframework:spring-beans:5.3.23'
+
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'ch.qos.logback:logback-classic:1.2.11'
+    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'commons-fileupload:commons-fileupload:1.4'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    // JDBC
+    implementation 'org.springframework:spring-jdbc:5.3.23'
+    implementation 'mysql:mysql-connector-java:8.0.30'
+
+    // Cloudinary
+    implementation 'com.cloudinary:cloudinary-core:1.38.0'
+    implementation 'com.cloudinary:cloudinary-http44:1.32.2'
+
+    // Validation
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'org.hibernate.validator:hibernate-validator:6.1.0.Final'
+
+    // Thymeleaf
+    implementation 'org.thymeleaf:thymeleaf-spring5:3.0.12.RELEASE'
+
+
+
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.6.15.Final'
+    implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.6.15.Final'
+    // spring orm
+    implementation group: 'org.springframework', name: 'spring-orm', version: '5.3.37'
+    implementation 'org.springframework.data:spring-data-commons:2.7.0'
 }
 
 test {

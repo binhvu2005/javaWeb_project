@@ -67,7 +67,7 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource()); // Đảm bảo dataSource() đã được cấu hình chính xác
-        em.setPackagesToScan("com.data.project_javaWeb.entity"); // Đường dẫn đến các entity
+        em.setPackagesToScan("com.data..entity"); // Đường dẫn đến các entity
 
         // Cấu hình Hibernate
         Properties properties = new Properties();

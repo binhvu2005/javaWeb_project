@@ -3,11 +3,18 @@ package com.data.project_javaWeb.entity;
 import com.data.project_javaWeb.entity.enums.InterviewRequestResult;
 import com.data.project_javaWeb.entity.enums.InterviewResult;
 import com.data.project_javaWeb.entity.enums.Progress;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "application")
 public class Application {

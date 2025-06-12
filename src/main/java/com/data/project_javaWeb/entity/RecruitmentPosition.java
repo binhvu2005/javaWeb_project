@@ -1,12 +1,19 @@
 package com.data.project_javaWeb.entity;
 
 import com.data.project_javaWeb.entity.enums.Status;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "recruitment_position")
 public class RecruitmentPosition {

@@ -3,9 +3,16 @@ package com.data.project_javaWeb.entity;
 import com.data.project_javaWeb.entity.enums.AccountStatus;
 import com.data.project_javaWeb.entity.enums.Role;
 import com.data.project_javaWeb.entity.Candidate;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "account")
 public class Account {

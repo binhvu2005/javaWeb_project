@@ -14,6 +14,7 @@ import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -56,7 +57,7 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setUrl("jdbc:mysql://localhost:3306/project_javaWeb?createDatabaseIfNotExist=true&useSSL=false");
+        dataSource.setUrl("jdbc:mysql://localhost:3306/webapp_project?createDatabaseIfNotExist=true&useSSL=false");
         dataSource.setUsername("root");
         dataSource.setPassword("123456");
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
@@ -67,7 +68,7 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource()); // Đảm bảo dataSource() đã được cấu hình chính xác
-        em.setPackagesToScan("com.data..entity"); // Đường dẫn đến các entity
+        em.setPackagesToScan("com.data.project_javaWeb.entity"); // Đường dẫn đến các entity
 
         // Cấu hình Hibernate
         Properties properties = new Properties();
@@ -113,13 +114,13 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
     @Bean
     public ClassLoaderTemplateResolver templateResolver() {
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
-        templateResolver.setPrefix("templates/"); // Đường dẫn đến thư mục chứa các file Thymeleaf
+        templateResolver.setPrefix("templates/");
         templateResolver.setSuffix(".html");
         templateResolver.setTemplateMode("HTML");
         templateResolver.setCharacterEncoding("UTF-8");
-//        templateResolver.setCacheable(false);
         return templateResolver;
     }
+
 
     @Bean
     public SpringTemplateEngine templateEngine() {
@@ -148,5 +149,9 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
         registry.addResourceHandler("/static/**")
                 .addResourceLocations("/static/");
 
+    }
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 }

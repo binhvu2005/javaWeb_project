@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout}" lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Technology Management</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</head>
+<body>
+<div class="container mt-4" layout:fragment="content">
+    <!-- Modal -->
+    <div class="modal fade" id="technologyModal" tabindex="-1" aria-hidden="true"
+         th:classappend="${showModal} ? 'show d-block' : ''"
+         th:style="${showModal} ? 'background: rgba(0,0,0,0.5);' : ''"
+         style="padding-top: 100px;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form th:action="@{/admin/technology/save}" method="post" th:object="${technology}" id="technologyForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="technologyModalLabel"
+                            th:text="${technology.id != null} ? 'Edit Technology' : 'Add Technology'">Add Technology</h5>
+                        <button type="button" class="btn-close" onclick="window.location.href='/admin/technology'"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" th:field="*{id}" id="technologyId">
+                        <div class="mb-3">
+                            <label class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" th:field="*{name}" id="technologyName">
+                            <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                        </div>
+                        <div class="text-danger" th:if="${error}" th:text="${error}"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='/admin/technology'">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="d-flex align-items-center mb-3" style="gap: 20px; padding-top: 20px;">
+        <img th:src="@{/icons/technologyIcon.svg}" style="width: 45px; height: 38px;" />
+        <h4 class="fw-bold mb-3">Technology</h4>
+    </div>
+    <hr/>
+
+    <!-- Tìm kiếm & nút thêm -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <button type="button" class="btn btn-danger" id="add-btn">
+                <i class="bi bi-plus-circle me-1"></i> Add Technology
+            </button>
+        </div>
+        <div class="col-md-4 offset-md-4">
+            <form th:action="@{/admin/technology}" method="get" class="d-flex">
+                <input type="text" name="keyword" th:value="${keyword}" class="form-control me-2" placeholder="Search...">
+                <button type="submit" class="btn btn-outline-secondary"><i class="bi bi-search"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bảng dữ liệu -->
+    <table class="table table-hover">
+        <thead class="table-light">
+        <tr>
+            <th>STT</th>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item, iter : ${page.content}">
+            <td th:text="${iter.index + 1 + page.number * page.size}">1</td>
+            <td th:text="${item.name}">Name</td>
+            <td>
+                <button type="button" class="btn btn-link text-warning edit-btn"
+                        th:attr="data-id=${item.id}, data-name=${item.name}">
+                    <i class="bi bi-pencil-square"></i>
+                </button>
+                <a th:href="@{'/admin/technology/delete/' + ${item.id}}"
+                   class="text-danger"
+                   onclick="return confirm('Are you sure you want to delete this technology?')">
+                    <i class="bi bi-trash-fill"></i>
+                </a>
+            </td>
+        </tr>
+        <tr th:if="${page.content.isEmpty()}">
+            <td colspan="3" class="text-center">No technologies found</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Phân trang -->
+    <nav th:if="${totalPages > 0}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/technology(page=${currentPage - 1}, keyword=${keyword})}">&laquo;</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                th:classappend="${i - 1 == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/admin/technology(page=${i - 1}, keyword=${keyword})}" th:text="${i}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage + 1 == totalPages} ? 'disabled'">
+                <a class="page-link" th:href="@{/admin/technology(page=${currentPage + 1}, keyword=${keyword})}">&raquo;</a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Script mở modal -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById('add-btn').addEventListener("click", function () {
+                const form = document.getElementById('technologyForm');
+                form.reset();
+                document.getElementById('technologyId').value = '';
+                document.getElementById('technologyModalLabel').innerText = 'Add Technology';
+                const modal = new bootstrap.Modal(document.getElementById('technologyModal'));
+                modal.show();
+            });
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener("click", function () {
+                    document.getElementById('technologyId').value = this.dataset.id;
+                    document.getElementById('technologyName').value = this.dataset.name;
+                    document.getElementById('technologyModalLabel').innerText = 'Edit Technology';
+                    new bootstrap.Modal(document.getElementById('technologyModal')).show();
+                });
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

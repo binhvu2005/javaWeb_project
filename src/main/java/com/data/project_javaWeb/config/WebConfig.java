@@ -2,6 +2,7 @@ package com.data.project_javaWeb.config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -82,6 +83,7 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
         return em;
     }
 
+
     @Bean
     public SessionFactory sessionFactory() {
         LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
@@ -126,6 +128,7 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
     public SpringTemplateEngine templateEngine() {
         SpringTemplateEngine templateEngine = new SpringTemplateEngine();
         templateEngine.setTemplateResolver(templateResolver());
+        templateEngine.addDialect(new LayoutDialect());
         return templateEngine;
     }
 
@@ -146,9 +149,8 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("/static/");
-
+        registry.addResourceHandler("/icons/**")
+                .addResourceLocations("classpath:/static/icons/");
     }
     @Bean
     public BCryptPasswordEncoder passwordEncoder(){

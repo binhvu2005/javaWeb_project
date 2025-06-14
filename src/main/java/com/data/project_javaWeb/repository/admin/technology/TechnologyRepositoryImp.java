@@ -1,7 +1,6 @@
-package com.data.project_javaWeb.repository.admin;
+package com.data.project_javaWeb.repository.admin.technology;
 
 import com.data.project_javaWeb.entity.Technology;
-import com.data.project_javaWeb.entity.enums.Status;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,12 @@ public class TechnologyRepositoryImp implements TechnologyRepository {
 
     private Session getSession() {
         return sessionFactory.getCurrentSession();
+    }
+
+    @Override
+    public List<Technology> getAllTechnologies() {
+        String hql = "FROM Technology ORDER BY id";
+        return getSession().createQuery(hql, Technology.class).list();
     }
 
     @Override

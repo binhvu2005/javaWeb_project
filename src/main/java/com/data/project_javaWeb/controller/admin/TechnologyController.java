@@ -2,7 +2,7 @@ package com.data.project_javaWeb.controller.admin;
 
 import com.data.project_javaWeb.dto.TechnologyDTO;
 import com.data.project_javaWeb.entity.Technology;
-import com.data.project_javaWeb.service.admin.TechnologyService;
+import com.data.project_javaWeb.service.admin.technology.TechnologyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;

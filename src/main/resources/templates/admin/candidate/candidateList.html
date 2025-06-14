@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout}" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Candidate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #fafbfc; margin: 0; padding: 0; }
+        .container { max-width: 1200px; background: #fff; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.04); padding: 32px; }
+        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .header i { font-size: 28px; color: #222; }
+        .header h2 { font-size: 24px; font-weight: 600; color: #222; margin: 0; }
+
+        .filters { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; align-items: center; }
+        .filters select, .filters input[type="text"] {
+            padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; background: #fafbfc; font-size: 15px; min-width: 120px;
+        }
+
+
+        .filters .search-box { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 6px; padding: 0 10px; background: #fafbfc; }
+        .filters .search-box input { border: none; background: transparent; outline: none; font-size: 15px; padding: 8px 0; width: 160px; }
+        .filters .search-box i { color: #bbb; font-size: 17px; }
+        .btn-refresh { background: #f5f5f5; border: 1px solid #ddd; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 16px; color: #333; display: flex; align-items: center; transition: 0.2s; height: 38px; }
+        .btn-refresh:hover { background: #eee; }
+        .btn-filter {
+            background: #1976d2;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            height: 38px;
+            transition: background 0.2s;
+        }
+        .btn-filter:hover {
+            background: #1565c0;
+        }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        th, td { padding: 12px 8px; text-align: left; font-size: 15px; }
+        th { background: #fafbfc; color: #888; font-weight: 600; border-bottom: 1.5px solid #f0f0f0; }
+        tr:not(:last-child) td { border-bottom: 1px solid #f5f5f5; }
+
+        .badge { background: #fff3e0; color: #ff9800; border: 1px solid #ffe0b2; border-radius: 6px; padding: 3px 10px; font-size: 13px; margin-right: 5px; margin-bottom: 2px; display: inline-block; }
+
+        .status { display: inline-flex; align-items: center; font-size: 14px; font-weight: 500; border-radius: 12px; padding: 3px 12px; }
+        .status.active { background: #eafaf1; color: #34a853; }
+        .status.deactivate { background: #fff0f0; color: #ea4335; }
+        .status .dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; display: inline-block; }
+        .status.active .dot { background: #34a853; }
+        .status.deactivate .dot { background: #ea4335; }
+
+        .highlight-email { background: #f3e8ff; color: #4b2997; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+
+        .actions i { font-size: 20px; cursor: pointer; margin: 0 4px; transition: 0.2s; }
+        .actions .lock { color: #ea4335; }
+        .actions .unlock { color: #34a853; }
+        .actions i:hover { opacity: 0.7; }
+
+        .pagination { display: flex; justify-content: flex-end; gap: 6px; margin-top: 18px; }
+        .pagination a button {
+            border: none; background: #fff; color: #222; padding: 7px 13px; border-radius: 5px; font-size: 15px;
+            cursor: pointer; border: 1px solid #eee; transition: 0.15s;
+        }
+        .pagination a button.active { background: #c62828; color: #fff; font-weight: 600; border: 1.5px solid #c62828; }
+        .pagination a button:disabled { color: #bbb; cursor: not-allowed; }
+
+        @media (max-width: 900px) { .container { padding: 12px 2px; } table, th, td { font-size: 13px; } }
+        @media (max-width: 600px) { .filters { flex-direction: column; gap: 8px; } .header h2 { font-size: 18px; } .container { padding: 4px; } }
+    </style>
+</head>
+<body>
+<div class="container" layout:fragment="content">
+    <div class="header">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <h2>Candidate</h2>
+    </div>
+
+    <form th:action="@{/admin/candidates}" method="get" class="filters " >
+        <select name="technologyId" class="scrollable-box">
+            <option value="">Technology</option>
+            <option th:each="tech : ${technologies}"
+                    th:value="${tech.id}"
+                    th:text="${tech.name}"
+                    th:selected="${tech.id == technologyId}"></option>
+        </select>
+
+        <select name="gender">
+            <option value="">Gender</option>
+            <option value="MALE" th:selected="${gender == 'MALE'}">Male</option>
+            <option value="FEMALE" th:selected="${gender == 'FEMALE'}">Female</option>
+            <option value="OTHER" th:selected="${gender == 'OTHER'}">Other</option>
+        </select>
+
+        <select name="age">
+            <option value="">Age</option>
+            <option value="20" th:selected="${age == 20}">20+</option>
+            <option value="25" th:selected="${age == 25}">25+</option>
+            <option value="30" th:selected="${age == 30}">30+</option>
+        </select>
+
+        <select name="experience">
+            <option value="">Experience</option>
+            <option value="1" th:selected="${experience == 1}">1+</option>
+            <option value="3" th:selected="${experience == 3}">3+</option>
+            <option value="5" th:selected="${experience == 5}">5+</option>
+        </select>
+
+        <div class="search-box">
+            <i class="fa fa-search"></i>
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="Search by name or email...">
+        </div>
+        <button type="submit" class="btn-filter">
+            <i class="fa fa-filter"></i> Lọc
+        </button>
+
+        <a href="/admin/candidates" class="btn-refresh" title="Refresh">
+            <i class="fa fa-rotate-right"></i>
+        </a>
+    </form>
+
+    <table>
+        <thead>
+        <tr>
+            <th>STT</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Technology</th>
+            <th>Phone</th>
+            <th>Exp</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c, iStat : ${candidates}">
+            <td th:text="${iStat.index + 1 + (page * size)}"></td>
+            <td th:text="${c.name}"></td>
+            <td><span th:text="${c.email}" class="highlight-email"></span></td>
+            <td>
+                <span class="badge" th:each="tech : ${c.technologies}" th:text="${tech}"></span>
+            </td>
+
+            <td th:text="${c.phone}"></td>
+            <td th:text="${c.experience}"></td>
+            <td th:text="${c.age}"></td>
+            <td th:text="${c.gender}"></td>
+            <td>
+                <span th:class="'status ' + (${c.status} == 'ACTIVE' ? 'active' : 'deactivate')">
+                    <span class="dot"></span>
+                    <span th:text="${c.status == 'ACTIVE' ? 'Active' : 'Deactivate'}"></span>
+                </span>
+            </td>
+            <td class="actions">
+                <a th:href="@{/admin/candidates/toggle/{id}(id=${c.id})}" th:title="${c.status == 'ACTIVE' ? 'Khoá' : 'Mở khoá'}">
+                    <i th:class="'fa-solid ' + (${c.status} == 'ACTIVE' ? 'fa-lock lock' : 'fa-lock-open unlock')"></i>
+                </a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(candidates)}">
+            <td colspan="10" class="text-center text-muted">No candidates found.</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="pagination" th:if="${totalPages > 0}">
+        <!-- Nút Previous -->
+        <a th:if="${page > 0}"
+           th:href="@{/admin/candidates(page=${page - 1}, size=${size}, keyword=${keyword}, technologyId=${technologyId}, gender=${gender}, age=${age}, experience=${experience})}">
+            <button><i class="fa fa-angle-left"></i></button>
+        </a>
+        <a th:unless="${page > 0}">
+            <button disabled><i class="fa fa-angle-left"></i></button>
+        </a>
+
+        <!-- Các nút số trang -->
+        <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+            <a th:href="@{/admin/candidates(page=${i}, size=${size}, keyword=${keyword}, technologyId=${technologyId}, gender=${gender}, age=${age}, experience=${experience})}">
+                <button th:classappend="${i == page} ? 'active'">[[${i + 1}]]</button>
+            </a>
+        </th:block>
+
+        <!-- Nút Next -->
+        <a th:if="${page < totalPages - 1}"
+           th:href="@{/admin/candidates(page=${page + 1}, size=${size}, keyword=${keyword}, technologyId=${technologyId}, gender=${gender}, age=${age}, experience=${experience})}">
+            <button><i class="fa fa-angle-right"></i></button>
+        </a>
+        <a th:unless="${page < totalPages - 1}">
+            <button disabled><i class="fa fa-angle-right"></i></button>
+        </a>
+    </div>
+
+
+
+</div>
+</body>
+</html>

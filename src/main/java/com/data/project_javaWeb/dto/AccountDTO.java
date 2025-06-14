@@ -1,6 +1,8 @@
 package com.data.project_javaWeb.dto;
 
 
+import com.data.project_javaWeb.entity.enums.AccountStatus;
+import com.data.project_javaWeb.entity.enums.Status;
 import lombok.Data;
 
 import javax.validation.constraints.*;
@@ -23,5 +25,5 @@ public class AccountDTO {
     private String role;
 
 
-    private String status;
+    private AccountStatus status;
 }

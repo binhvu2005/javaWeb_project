@@ -1,14 +1,15 @@
-package com.data.project_javaWeb.service.admin;
+package com.data.project_javaWeb.service.admin.technology;
 
 import com.data.project_javaWeb.dto.TechnologyDTO;
 import com.data.project_javaWeb.entity.Technology;
 import com.data.project_javaWeb.entity.enums.Status;
-import com.data.project_javaWeb.repository.admin.TechnologyRepository;
+import com.data.project_javaWeb.repository.admin.technology.TechnologyRepository;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Transactional
 @Service
@@ -17,6 +18,11 @@ public class TechnologyServiceImp implements TechnologyService {
     private final TechnologyRepository repository;
     public TechnologyServiceImp(TechnologyRepository repository) {
         this.repository = repository;
+    }
+
+    @Override
+    public List<Technology> getAllTechnologies() {
+        return repository.getAllTechnologies();
     }
 
     @Override

@@ -2,122 +2,205 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sign In</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
     <style>
         body {
-            background-color: #ffffff;
-            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            background-color: #fff;
+            margin: 0;
+        }
+
+        .login-container {
             display: flex;
+            min-height: 100vh;
+        }
+
+        .login-left {
+            flex: 1;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
+            background-color: #fff;
+            flex: none;
+        }
+
+        .login-right {
+            flex: 1;
+            display: flex;
             align-items: center;
-            font-family: "Roboto", sans-serif;
+            justify-content: center;
+            padding: 40px;
         }
-        .sign-in-container {
-            width: 460px;
-            text-align: center;
+
+        .login-left img {
+            max-width: 100%;
+            height: auto;
         }
+
         .brand-title {
-            font-family: "Poppins", sans-serif;
-            font-weight: 700;
-            font-size: 48px;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
             margin-bottom: 10px;
         }
+
         .brand-title .text-danger {
-            color: #ab1f24 !important;
-        }
-        .heading {
-            font-size: 26.6px;
-            margin-bottom: 20px;
-        }
-        .form-control {
-            background-color: #f5f5f5;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        .sign-in-footer {
-            margin-top: 20px;
-            font-size: 16px;
-            color: rgba(33, 37, 41, 0.75);
-        }
-        .register-text {
-            font-size: 16px;
-        }
-        .register-text a {
             color: #ab1f24;
-            text-decoration: underline;
-            margin-left: 5px;
         }
-        .error-message {
+
+        .heading {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        .form-control {
+            height: 45px;
+            font-size: 15px;
+            padding: 10px;
+            background-color: #f1f5ff;
+        }
+
+        .form-control.is-invalid {
+            border: 1px solid #dc3545;
+        }
+
+        .invalid-feedback {
+            font-size: 13px;
             color: #dc3545;
-            font-size: 14px;
+            margin-top: -10px;
             margin-bottom: 15px;
         }
-        .success-message {
-            color: #198754;
+
+        .btn-login {
+            background-color: #ab1f24;
+            color: white;
+            font-weight: 500;
+            height: 45px;
+            border: none;
+        }
+
+        .btn-login:hover {
+            background-color: #911a1e;
+        }
+
+        .toggle-forgot {
+            cursor: pointer;
+            color: #ab1f24;
             font-size: 14px;
-            margin-bottom: 15px;
+        }
+
+        .toggle-forgot:hover {
+            text-decoration: underline;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .text-small {
+            font-size: 14px;
+        }
+
+        .copy-text {
+            font-size: 12px;
+            text-align: center;
+            margin-top: 30px;
+            color: #999;
+        }
+        .signup-form-box {
+            width: 100%;
+            max-width: 380px;
         }
     </style>
 </head>
 <body>
-<div class="sign-in-container">
-    <div class="brand-title">
-        <span>My </span><span class="text-danger">Company</span>
+
+<div class="login-container">
+    <!-- Left: Hình ảnh -->
+    <div class="login-left">
+        <img th:src="@{/icons/loginIMG.svg}" alt="Login illustration"  style="max-width: 100%; height: auto;">
     </div>
 
-    <div class="heading">Please sign in</div>
+    <!-- Right: Form -->
+    <div class="login-right">
+        <div class="signup-form-box">
+        <div class="brand-title">Intern <span class="text-danger">SHIP</span></div>
+        <div class="heading">Please login</div>
 
-    <!-- Hiển thị lỗi nếu có -->
-    <div th:if="${loginError}" class="alert alert-danger error-message" role="alert">
-        <span th:text="${loginError}"></span>
+        <!-- Thông báo -->
+        <div th:if="${loginError}" class="alert alert-danger" th:text="${loginError}"></div>
+        <div th:if="${logoutMessage}" class="alert alert-success" th:text="${logoutMessage}"></div>
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Section 1: Đăng nhập -->
+        <div id="loginForm" th:class="'form-section ' + (${step} == null ? 'active' : '')">
+            <form th:action="@{/login}" method="post" th:object="${loginDTO}">
+                <input type="email" th:field="*{email}" class="form-control mb-2"
+                       th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" placeholder="Enter your email" required />
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+
+                <input type="password" th:field="*{password}" class="form-control mb-2"
+                       th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" placeholder="Enter your password" required />
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+
+                <button type="submit" class="btn btn-login w-100 mb-3">Sign In</button>
+            </form>
+            <p class="text-center toggle-forgot" onclick="switchForm('forgotForm')">Forgot Password?</p>
+            <p class="text-center text-small mt-3">Don’t have an account? <a th:href="@{/register}">Register</a></p>
+        </div>
+
+        <!-- Section 2: Gửi mã xác nhận -->
+        <div id="forgotForm" th:class="'form-section ' + (${step} == 'forgot' ? 'active' : '')">
+            <form th:action="@{/forgot-password/send-code}" method="post">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control mb-3" placeholder="Enter your email" required />
+                <button type="submit" class="btn btn-login w-100">Send Verification Code</button>
+            </form>
+            <p class="text-center toggle-forgot mt-3" onclick="switchForm('loginForm')">Back to Login</p>
+        </div>
+
+        <!-- Section 3: Nhập mã xác nhận -->
+        <div id="verifyForm" th:class="'form-section ' + (${step} == 'verify' ? 'active' : '')">
+            <form th:action="@{/forgot-password/verify-code}" method="post">
+                <label>Verification Code</label>
+                <input type="text" name="code" class="form-control mb-3" placeholder="Enter verification code" required />
+                <button type="submit" class="btn btn-login w-100">Verify</button>
+            </form>
+        </div>
+
+        <!-- Section 4: Reset mật khẩu -->
+        <div id="resetForm" th:class="'form-section ' + (${step} == 'reset' ? 'active' : '')">
+            <form th:action="@{/forgot-password/reset-password}" method="post">
+                <label>New Password</label>
+                <input type="password" name="password" class="form-control mb-3" placeholder="New password" required />
+                <label>Confirm Password</label>
+                <input type="password" name="confirmPassword" class="form-control mb-3" placeholder="Confirm password" required />
+                <button type="submit" class="btn btn-login w-100">Reset Password</button>
+            </form>
+        </div>
+
+        <p class="copy-text">© 2025 - Rikkei Education</p>
     </div>
-
-    <!-- Hiển thị thông báo đăng xuất -->
-    <div th:if="${logoutMessage}" class="alert alert-success success-message" role="alert">
-        <span th:text="${logoutMessage}"></span>
     </div>
-
-    <!-- Form đăng nhập -->
-    <form th:action="@{/login}" th:object="${accountDTO}" method="post">
-        <div class="mb-3">
-            <input type="email"
-                   class="form-control"
-                   th:field="*{email}"
-                   placeholder="Please enter your email ..."
-                   required autofocus />
-        </div>
-
-        <div class="mb-3">
-            <input type="password"
-                   class="form-control"
-                   th:field="*{password}"
-                   placeholder="Please enter your password ..."
-                   required />
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="form-check">
-                <input class="form-check-input"
-                       type="checkbox"
-                       id="rememberMe"
-                       name="rememberMe">
-                <label class="form-check-label" for="rememberMe">Remember me</label>
-            </div>
-            <div class="register-text">
-                Don't have an account,
-                <a th:href="@{/register}">click here!</a>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-primary w-100">Sign in</button>
-    </form>
-
-    <div class="sign-in-footer">© 2025 - Rikkei Education</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function switchForm(id) {
+        document.querySelectorAll('.form-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(id).classList.add('active');
+    }
+</script>
+
 </body>
 </html>

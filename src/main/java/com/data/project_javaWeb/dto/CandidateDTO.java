@@ -4,6 +4,7 @@ import com.data.project_javaWeb.entity.Account;
 import com.data.project_javaWeb.entity.Candidate;
 import com.data.project_javaWeb.entity.Technology;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ public class CandidateDTO {
     @Pattern(regexp = "MALE|FEMALE|OTHER", message = "Giới tính không hợp lệ")
     private String gender;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "Ngày sinh không được để trống")
     @Past(message = "Ngày sinh phải là trong quá khứ")
     private LocalDate dob;
@@ -70,12 +72,12 @@ public class CandidateDTO {
                     .collect(Collectors.toList()));
         }
 
-        if (entity.getAccounts() != null && !entity.getAccounts().isEmpty()) {
-            Account acc = entity.getAccounts().get(0); // hoặc chọn theo logic khác
-            if (acc != null && acc.getStatus() != null) {
-                dto.setStatus(acc.getStatus().name());
-            }
+        Account acc = entity.getAccount();
+        if (acc != null && acc.getStatus() != null) {
+            dto.setStatus(acc.getStatus().name());
         }
+
+
 
         return dto;
     }

@@ -1,6 +1,7 @@
 package com.data.project_javaWeb.service.admin.candidate;
 
 import com.data.project_javaWeb.dto.CandidateDTO;
+import com.data.project_javaWeb.entity.Candidate;
 import com.data.project_javaWeb.repository.admin.candidate.CandidateRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,5 +25,15 @@ public class CandidateServiceImp implements CandidateService {
     @Override
     public void toggleStatus(int candidateId) {
         candidateRepository.updateAccountStatusByCandidateId(candidateId);
+    }
+
+    @Override
+    public void update(Candidate candidate) {
+        candidateRepository.update(candidate);
+    }
+
+    @Override
+    public Candidate findByEmail(String email) {
+        return candidateRepository.findByEmail(email);
     }
 }

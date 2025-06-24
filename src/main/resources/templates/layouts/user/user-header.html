@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>InternSHIP Header</title>
+
+</head>
+<body>
+<div th:fragment="header">
+    <style>
+        .custom-navbar {
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 8px 0;
+            font-family: Roboto, sans-serif;
+        }
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 36px !important; /* hoặc lớn hơn nếu muốn */
+            font-family: Roboto, sans-serif;
+            text-decoration: none;
+            color: #212529;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+
+        }
+        .navbar-brand .text-danger {
+            color: #AB1F24;
+        }
+        .d-flex {
+            display: flex;
+            align-items: center;
+        }
+        .btn-login {
+            background: #AB1F24;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: 500;
+            text-decoration: none;
+            margin-left: 16px;
+            transition: background 0.2s;
+        }
+        .btn-login:hover {
+            background: #8c1820;
+            color: #fff;
+            text-decoration: none;
+        }
+        /* Dropdown styles */
+        .custom-dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 16px;
+        }
+        .dropdown-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            outline: none;
+            font-size: 20px;
+            font-weight: 700;
+            color: #212529;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        .dropdown-btn span.candidate-name {
+            color: #AB1F24;
+            margin-left: 4px;
+        }
+        .dropdown-btn .arrow {
+            margin-left: 8px;
+            font-size: 16px;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #fff;
+            min-width: 200px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 1000;
+            border-radius: 6px;
+            margin-top: 4px;
+            padding: 8px 0;
+        }
+        .dropdown-content a {
+            color: #212529;
+            padding: 12px 24px;
+            text-decoration: none;
+            display: block;
+            font-weight: 400;
+            font-size: 16px;
+            border: none;
+            background: none;
+            transition: background 0.2s;
+        }
+        .dropdown-content a.text-danger {
+            color: #AB1F24;
+        }
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+        .dropdown-content hr {
+            margin: 4px 0;
+            border: none;
+            border-top: 1px solid #eee;
+        }
+        /* Ẩn gạch chân cho mọi link trong navbar */
+        .custom-navbar a, .custom-navbar a:visited, .custom-navbar a:active {
+            text-decoration: none !important;
+        }
+    </style>
+    <nav class="custom-navbar">
+        <div class="navbar-container">
+            <a class="navbar-brand" href="/user/home">
+                Intern <span class="text-danger">SHIP</span>
+            </a>
+            <div class="d-flex">
+                <!-- Nếu chưa đăng nhập -->
+                <a class="btn-login" th:if="${session.currentUser == null}" href="/login">Sign In / Sign Up</a>
+
+                <!-- Nếu đã đăng nhập -->
+                <div th:if="${session.currentUser != null}" class="custom-dropdown">
+                    <button class="dropdown-btn" type="button" onclick="toggleDropdown()">
+                        Hello,
+                        <span class="candidate-name" th:text="${candidateName}">Tên người dùng</span>
+                        <span class="arrow">&#9660;</span>
+                    </button>
+                    <div id="dropdownMenu" class="dropdown-content">
+                        <a href="/user/info">Information</a>
+                        <a href="/user/applications">My Application</a>
+                        <hr>
+                        <a href="/logout" class="text-danger">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <script>
+        function toggleDropdown() {
+            let menu = document.getElementById("dropdownMenu");
+            if (menu.style.display === "block") {
+                menu.style.display = "none";
+            } else {
+                menu.style.display = "block";
+            }
+        }
+        // Đóng dropdown khi click ra ngoài
+        window.onclick = function(event) {
+            if (!event.target.closest('.custom-dropdown')) {
+                var menu = document.getElementById("dropdownMenu");
+                if (menu && menu.style.display === "block") {
+                    menu.style.display = "none";
+                }
+            }
+        }
+    </script>
+</div>
+
+
+</body>
+</html>

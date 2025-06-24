@@ -40,7 +40,7 @@ public class RecruitmentPosition {
 
     private LocalDate expiredDate;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "recruitment_position_technology",
             joinColumns = @JoinColumn(name = "positionId"),

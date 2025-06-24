@@ -25,8 +25,8 @@ public class Candidate {
 
     @Column(unique = true, nullable = false)
     private String email;
-
-    private String phone;
+    @Column(unique = true)
+    private String phone ;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -38,10 +38,11 @@ public class Candidate {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Account> accounts;
+    @OneToOne(mappedBy = "candidate")
+    private Account account;
 
-    @ManyToMany
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "candidate_technology",
             joinColumns = @JoinColumn(name = "candidateId"),

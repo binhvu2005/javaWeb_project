@@ -28,7 +28,7 @@ public class CandidateRepositoryImp implements CandidateRepository {
         StringBuilder hql = new StringBuilder("SELECT DISTINCT c FROM Candidate c LEFT JOIN c.technologies t WHERE 1=1");
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            hql.append(" AND (c.name LIKE :kw OR c.email LIKE :kw)");
+            hql.append(" AND (c.name LIKE :kw)");
         }
         if (techId != null) {
             hql.append(" AND t.id = :techId");
@@ -82,4 +82,20 @@ public class CandidateRepositoryImp implements CandidateRepository {
         String hql = "UPDATE Account SET status = CASE WHEN status = 'ACTIVE' THEN 'INACTIVE' ELSE 'ACTIVE' END WHERE candidate.id = :cid";
         currentSession().createQuery(hql).setParameter("cid", candidateId).executeUpdate();
     }
+
+    @Override
+    public void update(Candidate candidate) {
+        currentSession().update(candidate);
+    }
+
+    @Override
+    public Candidate findByEmail(String email) {
+        String hql = "FROM Candidate c WHERE c.email = :email";
+        TypedQuery<Candidate> query = currentSession().createQuery(hql, Candidate.class);
+        query.setParameter("email", email.trim().toLowerCase());
+
+        List<Candidate> result = query.getResultList();
+        return result.isEmpty() ? null : result.get(0);
+    }
+
 }

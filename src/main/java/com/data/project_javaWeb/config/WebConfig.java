@@ -2,14 +2,18 @@ package com.data.project_javaWeb.config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.hibernate.SessionFactory;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -27,6 +31,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -47,9 +52,10 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
     @Bean
     public Cloudinary cloudinary() {
         Map<String, String> config = ObjectUtils.asMap(
-                "cloud_name", "dg10ca49n",
-                "api_key", "794153818827852",
-                "api_secret", "qrAX6DlWgDl--izJcSK7gvAZ8eQ"
+                "cloud_name", "deheyxek1",
+                "api_key", "121644263168842",
+                "api_secret", "nSKH4EEF7fiu80_OvxunG1PZpUQ",
+                "secure", true
         );
         return new Cloudinary(config);
     }
@@ -156,4 +162,18 @@ public class WebConfig implements WebMvcConfigurer , ApplicationContextAware {
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+    @Bean
+    public MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter(ObjectMapper objectMapper) {
+        return new MappingJackson2HttpMessageConverter(objectMapper);
+    }
+
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(mappingJackson2HttpMessageConverter(new ObjectMapper()));
+    }
+
 }

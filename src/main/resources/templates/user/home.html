@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>InternSHIP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { font-family: Roboto, sans-serif; background-color: #fff; margin: 0; padding: 0; }
+        .hero-section { background: url('/icons/baner.svg') center/cover no-repeat; color: #fff; padding: 60px 0 40px; text-align: center; }
+        .hero-title { font-size: 48px; font-weight: bold; margin-bottom: 10px; }
+        .hero-desc { font-size: 20px; margin: 12px 0 32px; }
+        .hero-search { background: #fff; border-radius: 12px; padding: 24px 32px; box-shadow: 0 4px 32px rgba(0,0,0,0.10); display: flex; align-items: center; max-width: 700px; margin: auto; }
+        .hero-search select, .hero-search input { border: none; font-size: 18px; margin-right: 16px; padding: 8px; }
+        .hero-search input { flex: 1; }
+        .hero-search .btn { background: #AB1F24; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; }
+        .position-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 960px; margin: auto; padding-top: 20px; }
+        .position-item { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #E0E0E0; border-radius: 10px; padding: 16px; transition: 0.2s ease; cursor: pointer; }
+        .position-item:hover { border: 2px solid #E63946; }
+        .position-icon { font-size: 30px; color: #E63946; }
+        .position-name { font-weight: 600; font-size: 16px; margin-bottom: 4px; color: #000; }
+        .position-tags { display: flex; gap: 6px; margin-bottom: 4px; }
+        .tag { background-color: #E0F7FF; color: #00AEEF; font-size: 12px; padding: 2px 8px; border-radius: 6px; }
+        .position-time { font-size: 12px; color: #999; }
+        .position-link { font-size: 18px; color: #333; }
+        .pagination { display: flex; justify-content: center; padding: 20px 0; }
+        .pagination .page-item.disabled .page-link,
+        .pagination .page-item .page-link:disabled { color: #ccc; }
+        .pagination .page-item.active .page-link { background: #AB1F24; color: white; border-color: #AB1F24; }
+    </style>
+</head>
+<body>
+<div class="layout-container">
+    <div class="layout-header" th:replace="~{layouts/user/user-header :: header}"></div>
+    <div class="layout-content" layout:fragment="content">
+        <div class="hero-section">
+            <div class="container">
+                <div class="hero-title">Intern SHIP</div>
+                <div class="hero-desc">Practical experience, breakthrough technology potential</div>
+                <div>Join the internship program to learn from experts, sharpen your practical skills, and prepare for a bright future career.</div>
+                <form class="hero-search mt-4" method="get" th:action="@{/user/home}">
+                    <select name="tech">
+                        <option value="">All Tech</option>
+                        <option th:each="t : ${technologies}" th:value="${t.name}" th:text="${t.name}" th:selected="${t.name == selectedTech}"></option>
+                    </select>
+                    <input type="text" name="keyword" class="form-control" placeholder="Enter internship position..." th:value="${keyword}">
+                    <button class="btn" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="container">
+            <h2 class="text-center my-4">Available Internship Positions</h2>
+            <div class="position-list">
+                <div th:each="p : ${positions}" class="position-item" th:onclick="'location.href=\'/user/position/' + ${p.id} + '\''">
+                    <div class="position-icon">📄</div>
+                    <div class="position-content">
+                        <div class="position-name" th:text="${p.name}"></div>
+                        <div class="position-tags">
+                            <div class="tag" th:each="tech : ${p.technologies}" th:text="${tech}"></div>
+                        </div>
+                        <div class="position-time"
+                             th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(p.createdDate, T(java.time.LocalDate).now()) == 0 ? 'Hôm nay' : T(java.time.temporal.ChronoUnit).DAYS.between(p.createdDate, T(java.time.LocalDate).now()) + ' ngày trước'}">
+                        </div>
+                    </div>
+                    <div class="position-link">↗</div>
+                </div>
+            </div>
+
+            <nav th:if="${totalPages > 0}">
+                <ul class="pagination justify-content-center mt-4">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/user/home(page=${currentPage - 1}, keyword=${keyword}, tech=${selectedTech})}">&laquo;</a>
+                    </li>
+
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${i == currentPage} ? 'active'">
+                        <a class="page-link"
+                           th:href="@{/user/home(page=${i}, keyword=${keyword}, tech=${selectedTech})}"
+                           th:text="${i + 1}"></a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/user/home(page=${currentPage + 1}, keyword=${keyword}, tech=${selectedTech})}">&raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+    <div class="layout-footer" th:replace="~{layouts/user/user-footer :: footer}"></div>
+</div>
+</body>
+</html>

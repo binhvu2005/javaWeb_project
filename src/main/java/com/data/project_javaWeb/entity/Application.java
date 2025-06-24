@@ -60,5 +60,5 @@ public class Application {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt  = LocalDateTime.now();
 }

@@ -1,11 +1,12 @@
 package com.data.project_javaWeb.dto;
 
-
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -32,9 +33,16 @@ public class RecruitmentPositionDTO {
 
     private LocalDate createdDate;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "Ngày hết hạn không được để trống")
     private LocalDate expiredDate;
 
     @NotEmpty(message = "Danh sách công nghệ không được để trống")
-    private List<Integer> technologyIds;
+    private List<String> technologies; // Tên công nghệ
+    public String getFormattedCreatedDate() {
+        return createdDate != null ? createdDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
+    }
+    public String getFormattedExpiredDate() {
+        return expiredDate != null ? expiredDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "";
+    }
 }

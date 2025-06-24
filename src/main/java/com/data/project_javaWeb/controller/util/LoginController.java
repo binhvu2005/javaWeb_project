@@ -1,8 +1,8 @@
 package com.data.project_javaWeb.controller.util;
 
-import com.data.project_javaWeb.dto.AccountDTO;
+import com.data.project_javaWeb.dto.LoginDTO;
 import com.data.project_javaWeb.entity.Account;
-import com.data.project_javaWeb.repository.util.LoginRepository;
+import com.data.project_javaWeb.repository.util.login.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -10,7 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import javax.validation.Valid;
 
 @Controller
@@ -22,37 +22,65 @@ public class LoginController {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
-    // Hiển thị form đăng nhập
+    // Hiển thị form đăng nhập + kiểm tra cookie đăng nhập
     @GetMapping("/login")
-    public String showLoginForm(Model model) {
-        model.addAttribute("accountDTO", new AccountDTO());
+    public String showLoginForm(Model model,
+                                HttpSession session,
+                                @CookieValue(value = "rememberEmail", required = false) String emailFromCookie) {
+
+        // Nếu đã có session => chuyển hướng theo vai trò
+        Account currentUser = (Account) session.getAttribute("currentUser");
+        if (currentUser != null) {
+            if ("ADMIN".equals(currentUser.getRole().name())) {
+                return "redirect:/admin/dashboard";
+            } else if ("CANDIDATE".equals(currentUser.getRole().name())) {
+                return "redirect:/user/home";
+            }
+        }
+
+        // Nếu có cookie => tìm lại tài khoản và tự động đăng nhập
+        if (emailFromCookie != null) {
+            Account account = loginRepository.findByEmail(emailFromCookie);
+            if (account != null) {
+                session.setAttribute("currentUser", account);
+                if ("ADMIN".equals(account.getRole().name())) {
+                    return "redirect:/admin/dashboard";
+                } else if ("CANDIDATE".equals(account.getRole().name())) {
+                    return "redirect:/user/home";
+                }
+            }
+        }
+
+        // Nếu chưa đăng nhập thì hiển thị form login
+        model.addAttribute("loginDTO", new LoginDTO());
         return "util/login";
     }
 
-    // Xử lý đăng nhập thủ công
+    // Xử lý POST đăng nhập
     @PostMapping("/login")
-    public String login(@ModelAttribute("accountDTO") @Valid AccountDTO accountDTO,
+    public String login(@ModelAttribute("loginDTO") @Valid LoginDTO loginDTO,
                         BindingResult result,
                         HttpSession session,
-                        Model model) {
+                        Model model,
+                        HttpServletResponse response) {
+
         if (result.hasErrors()) {
             System.out.println("Dữ liệu không hợp lệ");
             return "util/login";
         }
 
-        System.out.println("Email nhập: " + accountDTO.getEmail());
-        System.out.println("Password nhập: " + accountDTO.getPassword());
+        System.out.println("Email nhập: " + loginDTO.getEmail());
+        System.out.println("Password nhập: " + loginDTO.getPassword());
 
-        Account account = loginRepository.findByEmail(accountDTO.getEmail());
+        Account account = loginRepository.findByEmail(loginDTO.getEmail());
         System.out.println("Tài khoản tìm thấy: " + account);
 
         if (account == null) {
-            System.out.println("Không tìm thấy tài khoản.");
             model.addAttribute("loginError", "Email hoặc mật khẩu không đúng!");
             return "util/login";
         }
 
-        boolean match = passwordEncoder.matches(accountDTO.getPassword(), account.getPassword());
+        boolean match = passwordEncoder.matches(loginDTO.getPassword(), account.getPassword());
         System.out.println("Mật khẩu khớp: " + match);
 
         if (!match) {
@@ -60,24 +88,37 @@ public class LoginController {
             return "util/login";
         }
 
-        System.out.println("Đăng nhập thành công với vai trò: " + account.getRole());
-
+        // Đăng nhập thành công => lưu session
         session.setAttribute("currentUser", account);
 
+        // Tạo cookie ghi nhớ email (7 ngày)
+        Cookie cookie = new Cookie("rememberEmail", account.getEmail());
+        cookie.setMaxAge(7 * 24 * 60 * 60); // 7 ngày
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        // Điều hướng theo vai trò
         if ("ADMIN".equals(account.getRole().name())) {
             return "redirect:/admin/dashboard";
         } else if ("CANDIDATE".equals(account.getRole().name())) {
-            return "redirect:/candidate/home";
+            return "redirect:/user/home";
         } else {
             model.addAttribute("loginError", "Tài khoản không hợp lệ!");
             return "util/login";
         }
     }
 
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
+    // Đăng xuất
+    @RequestMapping(value = "/logout", method = {RequestMethod.GET, RequestMethod.POST})
+    public String logout(HttpSession session, HttpServletResponse response) {
         session.invalidate();
-        return "redirect:/login?logout";
+
+        // Xóa cookie rememberEmail
+        Cookie cookie = new Cookie("rememberEmail", null);
+        cookie.setMaxAge(0); // xóa ngay
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
+        return "redirect:/login";
     }
 }

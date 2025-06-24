@@ -29,6 +29,6 @@ public class Technology {
     @ManyToMany(mappedBy = "technologies")
     private Set<Candidate> candidates;
 
-    @ManyToMany(mappedBy = "technologies")
+    @ManyToMany(mappedBy = "technologies" ,fetch = FetchType.EAGER)
     private Set<RecruitmentPosition> positions;
 }

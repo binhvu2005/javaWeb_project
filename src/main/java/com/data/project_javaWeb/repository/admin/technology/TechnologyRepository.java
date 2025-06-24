@@ -4,6 +4,7 @@ import com.data.project_javaWeb.entity.Technology;
 import java.util.List;
 
 public interface TechnologyRepository {
+
     List<Technology> getAllTechnologies();
     Technology findById(Integer id);
     Technology findByName(String name);
@@ -13,4 +14,6 @@ public interface TechnologyRepository {
     void save(Technology tech);
     void update(Technology tech);
     void delete(Technology tech);
+
+    List<Technology> findAllByNames(List<String> technologies);
 }

@@ -20,6 +20,8 @@ public class TechnologyServiceImp implements TechnologyService {
         this.repository = repository;
     }
 
+
+
     @Override
     public List<Technology> getAllTechnologies() {
         return repository.getAllTechnologies();
@@ -80,5 +82,13 @@ public class TechnologyServiceImp implements TechnologyService {
         } else {
             repository.delete(t);
         }
+    }
+
+    @Override
+    public List<Technology> findAllByNames(List<String> technologies) {
+        if (technologies == null || technologies.isEmpty()) {
+            return List.of(); // Return an empty list if no names are provided
+        }
+        return repository.findAllByNames(technologies);
     }
 }

@@ -20,9 +20,10 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "candidateId")
+    @OneToOne(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
+    @JoinColumn(name = "candidateId", unique = true)
     private Candidate candidate;
+
 
     @Column(unique = true, nullable = false)
     private String email;

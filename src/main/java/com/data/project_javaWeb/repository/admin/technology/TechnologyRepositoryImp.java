@@ -70,4 +70,12 @@ public class TechnologyRepositoryImp implements TechnologyRepository {
     public void delete(Technology tech) {
         getSession().delete(tech);
     }
+
+    @Override
+    public List<Technology> findAllByNames(List<String> technologies) {
+        String hql = "FROM Technology t WHERE t.name IN :names";
+        return getSession().createQuery(hql, Technology.class)
+                .setParameter("names", technologies)
+                .list();
+    }
 }

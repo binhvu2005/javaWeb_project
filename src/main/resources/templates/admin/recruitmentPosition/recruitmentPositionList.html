@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	  layout:decorate="~{layouts/admin/admin-layout}" lang="en"
+	  xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>Recruitment Position - My Company</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+	<style>
+		.main-content { padding: 30px; }
+		.header-title { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+		.header-controls { display: flex; justify-content: space-between; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+		.btn-primary { background: #AB1F24; border-color: #AB1F24; padding: 10px 20px; font-size: 16px; }
+		.btn-primary:hover { background: #8c1820; }
+		.form-control { padding: 8px; border-radius: 5px; }
+		.table th, .table td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+		.table th { background: #f8f9fa; font-weight: 600; }
+		.badge { background: #fff3cd; color: #856404; border-radius: 4px; padding: 4px 8px; font-size: 12px; margin-right: 5px; }
+		.actions a { margin-left: 8px; color: #AB1F24; font-size: 18px; }
+		.actions .delete { color: #dc3545; cursor: pointer; }
+		.pagination { display: flex; justify-content: center; align-items: center; margin-top: 20px; gap: 5px; }
+		.pagination button { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 5px 10px; font-size: 16px; cursor: pointer; }
+		.pagination button.active { background: #AB1F24; color: #fff; border-color: #AB1F24; }
+		.pagination button:disabled { color: #ccc; cursor: not-allowed; }
+		.modal .form-control.is-invalid { border-color: #dc3545; }
+		.modal .invalid-feedback { display: block; }
+	</style>
+</head>
+<body>
+<div class="main-content container-fluid" layout:fragment="content">
+	<div class="header-title">
+		<img src="https://cdn-icons-png.flaticon.com/512/1162/1162469.png" class="nav-icon" alt="Recruitment" style="height: 30px;"/>
+		<h2 class="mb-0">Recruitment Position</h2>
+	</div>
+
+	<div class="header-controls">
+		<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+			<i class="bi bi-plus-circle me-1"></i> Add Recruitment Position
+		</button>
+		<form th:action="@{/admin/recruitmentPosition}" method="get">
+			<input type="text" class="form-control" style="width: 220px;" name="searchKeyword" th:value="${searchKeyword}" placeholder="Search here...">
+		</form>
+	</div>
+
+	<table class="table">
+		<thead>
+		<tr>
+			<th>STT</th>
+			<th>Name</th>
+			<th>Min Salary</th>
+			<th>Max Salary</th>
+			<th>Min Experience</th>
+			<th>Technology</th>
+			<th>Created Date</th>
+			<th>Expired Date</th>
+			<th>Actions</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr th:each="position, iterStat : ${positions}">
+			<td th:text="${iterStat.count + (currentPage - 1) * 5}"></td>
+			<td th:text="${position.name}"></td>
+			<td th:text="${position.minSalary}"></td>
+			<td th:text="${position.maxSalary}"></td>
+			<td th:text="${position.minExperience} + ' years'"></td>
+			<td>
+				<span th:each="tech : ${position.technologies}" th:text="${tech}" th:class="'badge'"></span>
+			</td>
+
+			<td th:text="${position.formattedCreatedDate}"></td>
+			<td th:text="${position.formattedExpiredDate}"></td>
+			<td class="actions">
+				<a th:href="@{/admin/recruitmentPosition/edit/{id}(id=${position.id})}" title="Edit"><i class="bi bi-pencil-fill"></i></a>
+				<a href="#" class="delete" data-bs-toggle="modal"
+				   data-bs-target="#confirmDeleteModal"
+				   th:attr="data-id=${position.id},data-name=${position.name}"
+				   title="Delete"><i class="bi bi-trash-fill"></i></a>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+
+	<nav th:if="${totalPages > 0}">
+		<ul class="pagination justify-content-center">
+			<li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+				<a class="page-link" th:href="@{/admin/recruitmentPosition(page=${currentPage - 1}, searchKeyword=${searchKeyword})}">&laquo;</a>
+			</li>
+			<li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+				th:classappend="${i == currentPage} ? 'active'">
+				<a class="page-link" th:href="@{/admin/recruitmentPosition(page=${i}, searchKeyword=${searchKeyword})}" th:text="${i}">1</a>
+			</li>
+			<li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+				<a class="page-link" th:href="@{/admin/recruitmentPosition(page=${currentPage + 1}, searchKeyword=${searchKeyword})}">&raquo;</a>
+			</li>
+		</ul>
+	</nav>
+
+	<!-- Modal Xác nhận Xóa -->
+	<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content border-danger">
+				<div class="modal-header">
+					<h5 class="modal-title" id="confirmDeleteModalLabel">
+						<i class="bi bi-exclamation-circle text-danger me-2"></i> Xác nhận
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+				</div>
+				<div class="modal-body">
+					<p>Bạn có chắc chắn muốn xóa vị trí <strong id="deleteName">[Tên]</strong> khỏi hệ thống không?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+					<a id="confirmDeleteBtn" class="btn btn-danger">Xóa</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal Form Thêm/Sửa -->
+	<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" th:text="${editMode} ? 'Edit Position' : 'Add Position'"></h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+
+				<form th:object="${recruitmentPositionDTO}"
+					  th:action="${editMode} ? @{/admin/recruitmentPosition/update} : @{/admin/recruitmentPosition/save}"
+					  method="post">
+					<div class="modal-body">
+						<input type="hidden" th:field="*{id}" />
+						<input type="hidden" th:field="*{createdDate}" />
+
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label>Name</label>
+								<input type="text" th:field="*{name}" class="form-control"
+									   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" />
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+							</div>
+							<div class="col-md-6">
+								<label>Min Experience (years)</label>
+								<input type="number" th:field="*{minExperience}" class="form-control"
+									   th:classappend="${#fields.hasErrors('minExperience')} ? 'is-invalid'" />
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('minExperience')}" th:errors="*{minExperience}"></div>
+							</div>
+							<div class="col-md-6">
+								<label>Min Salary</label>
+								<input type="number" th:field="*{minSalary}" class="form-control"
+									   th:classappend="${#fields.hasErrors('minSalary')} ? 'is-invalid'" />
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('minSalary')}" th:errors="*{minSalary}"></div>
+							</div>
+							<div class="col-md-6">
+								<label>Max Salary</label>
+								<input type="number" th:field="*{maxSalary}" class="form-control"
+									   th:classappend="${#fields.hasErrors('maxSalary')} ? 'is-invalid'" />
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('maxSalary')}" th:errors="*{maxSalary}"></div>
+							</div>
+							<div class="col-md-6">
+								<label>Expired Date</label>
+								<input type="date" th:field="*{expiredDate}" class="form-control" />
+							</div>
+							<div class="col-md-12">
+								<label>Technologies</label>
+								<select th:field="*{technologies}" multiple="multiple" class="form-select"
+										th:classappend="${#fields.hasErrors('technologies')} ? 'is-invalid'">
+									<option th:each="tech : ${technologies}" th:value="${tech.name}" th:text="${tech.name}"></option>
+								</select>
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('technologies')}" th:errors="*{technologies}"></div>
+							</div>
+							<div class="col-md-12">
+								<label>Description</label>
+								<textarea th:field="*{description}" class="form-control" rows="4"
+										  th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'"></textarea>
+								<div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-primary">Save</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+	<script th:inline="javascript">
+		document.addEventListener('DOMContentLoaded', function () {
+			const deleteModal = document.getElementById('confirmDeleteModal');
+			const confirmBtn = document.getElementById('confirmDeleteBtn');
+			const deleteName = document.getElementById('deleteName');
+
+			deleteModal.addEventListener('show.bs.modal', function (event) {
+				const button = event.relatedTarget;
+				const id = button.getAttribute('data-id');
+				const name = button.getAttribute('data-name');
+
+				confirmBtn.setAttribute('href', '/admin/recruitmentPosition/delete/' + id);
+				deleteName.textContent = name;
+			});
+
+			let showModal = /*[[${showModal != null ? showModal : false}]]*/ false;
+			if (showModal) {
+				const modal = new bootstrap.Modal(document.getElementById('addModal'));
+				modal.show();
+			}
+		});
+	</script>
+</div>
+</body>
+</html>

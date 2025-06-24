@@ -7,9 +7,13 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface TechnologyService {
+
+
     List<Technology> getAllTechnologies();
     Page<Technology> list(String keyword, int page, int size);
     TechnologyDTO get(Integer id);
     void saveOrUpdate(TechnologyDTO dto);
     void delete(Integer id);
+
+    List<Technology> findAllByNames(List<String> technologies);
 }

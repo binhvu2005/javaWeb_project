@@ -1,0 +1,175 @@
+    <!DOCTYPE html>
+    <html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Sign Up</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            body {
+                margin: 0;
+                height: 100vh;
+                font-family: 'Poppins', sans-serif;
+                background-color: #ffffff;
+            }
+
+            .signup-wrapper {
+                display: flex;
+                height: 100%;
+            }
+
+            .signup-left {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 40px;
+            }
+
+            .signup-right {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 40px;
+            }
+
+            .signup-form-box {
+                width: 100%;
+                max-width: 380px;
+            }
+
+            .brand-title {
+                font-weight: 700;
+                font-size: 32px;
+                margin-bottom: 8px;
+                text-align: left;
+            }
+
+            .brand-title .text-danger {
+                color: #ab1f24 !important;
+            }
+
+            .heading {
+                font-size: 16px;
+                margin-bottom: 24px;
+                color: #6c757d;
+                text-align: left;
+            }
+
+            .form-control {
+                background-color: #f5f5f5;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 12px 16px;
+                margin-bottom: 16px;
+                font-size: 14px;
+            }
+
+            .form-control:focus {
+                border-color: #ab1f24;
+                box-shadow: 0 0 0 0.2rem rgba(171, 31, 36, 0.2);
+            }
+
+            .btn-signup {
+                background-color: #ab1f24;
+                color: white;
+                border: none;
+                width: 100%;
+                padding: 12px;
+                font-size: 16px;
+                border-radius: 8px;
+                margin-top: 10px;
+                transition: 0.3s ease;
+            }
+
+            .btn-signup:hover {
+                background-color: #911a1e;
+            }
+
+            .login-text {
+                font-size: 14px;
+                margin-top: 10px;
+                text-align: center;
+            }
+
+            .login-text a {
+                color: #ab1f24;
+                margin-left: 4px;
+                text-decoration: none;
+            }
+
+            .login-text a:hover {
+                text-decoration: underline;
+            }
+
+            .footer-text {
+                margin-top: 20px;
+                font-size: 13px;
+                color: #adb5bd;
+                text-align: center;
+            }
+
+            @media (max-width: 768px) {
+                .signup-wrapper {
+                    flex-direction: column-reverse;
+                }
+
+                .signup-left,
+                .signup-right {
+                    flex: none;
+                    padding: 20px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+
+    <div class="signup-wrapper">
+        <!-- Left: form -->
+        <div class="signup-left">
+            <div class="signup-form-box">
+                <div class="brand-title">
+                    Intern <span class="text-danger">SHIP</span>
+                </div>
+                <div class="heading">Please sign up</div>
+
+                <form th:action="@{/register}" th:object="${accountDTO}" method="post" novalidate>
+                    <input type="text" th:field="*{name}" class="form-control"
+                           th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'" placeholder="Please enter your name ..." />
+                    <div class="text-danger" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+
+                    <input type="email" th:field="*{email}" class="form-control"
+                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" placeholder="Please enter your email ..." />
+                    <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+
+                    <input type="password" th:field="*{password}" class="form-control"
+                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" placeholder="Please enter your password ..." />
+                    <div class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+
+                    <input type="password" th:field="*{confirmPassword}" class="form-control"
+                           th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid'" placeholder="Please confirm your password ..." />
+                    <div class="text-danger" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
+
+                    <div class="text-danger text-center" th:if="${emailExists != null}" th:text="${emailExists}"></div>
+
+                    <div class="login-text">
+                        Have an account? <a th:href="@{/login}">click here!</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-signup">Sign up</button>
+                </form>
+
+
+                <div class="footer-text">© 2025 - Rikkei Education</div>
+            </div>
+        </div>
+
+        <!-- Right: image -->
+        <div class="signup-right">
+            <img th:src="@{/icons/loginIMG.svg}" alt="Sign up illustration" style="max-width: 100%; height: auto;">
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+    </html>
